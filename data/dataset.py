@@ -44,7 +44,7 @@ class Dataset:
     Builds a dataset for model training.
     """
 
-    def __init__(self, x, y, split=(0.7, 0.2, 0.1), shuffle=True, normalize=True):
+    def __init__(self, x, y, split=(0.7, 0.2, 0.1), shuffle=True, normalize=False):
         """
         Assumes the shape of x: [num_items, x1, x2, ..., xN] and y: [num_items, y1, y2, ..., yM].
 
