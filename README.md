@@ -2,8 +2,8 @@
 ***
 
 The goal is to build a Python package providing the necessary functionality for 
-training Neural Network models from scratch. No Tensorflow or Pytorch. Just 
-old-fashioned Python and its computing library, Numpy.
+training Neural Network models from scratch. No Tensorflow or PyTorch. Just 
+old-fashioned Python and its computing library, NumPy.
 
 If you have any comments, questions, or concerns, I would love to hear from you \
 (e: mlnasell@uwaterloo.ca).
