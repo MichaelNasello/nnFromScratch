@@ -5,6 +5,16 @@ The goal is to build a Python package providing the necessary functionality for
 training Neural Network models from scratch. No TensorFlow or PyTorch. Just 
 old-fashioned Python and its computing library, NumPy.
 
+To demonstrate a fundamental understanding of Neural Networks and their complex
+intricacies, I built custom implementations for many common techniques and 
+structures. Written is code for trainable parameters, model layers, optimizers, 
+loss functions, and other needed infrastructure. Using this package, one can 
+build Neural Networks and achieve convergence on a variety of Machine Learning
+problems.
+
+More work will be done to improve convergence during training and to support 
+other layers, optimizers, loss functions, etc.
+
 If you have any comments, questions, or concerns, I would love to hear from you \
 (e: mlnasell@uwaterloo.ca).
 
