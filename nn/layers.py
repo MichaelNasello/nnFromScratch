@@ -63,91 +63,6 @@ class Dense:
         return self.downstream_grad
 
 
-class Convolution2D:
-    """
-    Defines a Convolutional layer.
-    """
-
-    def __init__(self, input_shape, out_filters, kernel_size=3, stride=1, padding="valid"):
-        """
-        Incoming tensors are expected to be of shape [batch, x, y, filter].
-        """
-
-        self.input_shape = input_shape
-        self.in_filters = self.input_shape[3]
-        self.out_filters = out_filters
-        self.kernel_size = kernel_size
-        self.stride = stride
-        self.padding = padding
-
-        # Set padding value
-        if self.padding == "valid":
-            self.p = 0
-        elif self.padding == "same":
-            # TODO: same padding
-            raise NotImplementedError
-        elif type(self.padding) == int:
-            self.p = self.padding
-
-        # Stored for gradient calculation
-        self.input = None
-        self.input_padded = None
-        self.upstream_grad = None
-        self.downstream_grad = None
-
-        # Glorot Uniform Initialization
-        sd = np.sqrt(6 / (np.square(self.kernel_size) * (self.in_filters + self.out_filters)))
-        w_init = np.random.uniform(
-            -sd,
-            sd,
-            size=(
-                self.in_filters,
-                self.kernel_size,
-                self.kernel_size,
-                self.out_filters
-            )
-        )
-        b_init = np.zeros(shape=self.out_filters)
-
-        self.w = Variable(w_init)
-        self.b = Variable(b_init)
-
-    def __call__(self, x):
-        self.input = x
-        self.input_padded = np.pad(x, ((0,), (self.p,), (self.p,), (0,)), "constant")
-
-        # Output has shape [batch, n_w, n_h, out_filters]
-        n_w = (x.shape[1] + 2 * self.p - self.kernel_size) // self.stride + 1
-        n_h = (x.shape[2] + 2 * self.p - self.kernel_size) // self.stride + 1
-        output = np.empty(shape=(x.shape[0], n_w, n_h, self.out_filters))
-
-        for batch in range(self.input.shape[0]):
-            for in_filter in range(self.in_filters):
-                for out_filter in range(self.out_filters):
-                    for w in range(n_w):
-                        for h in range(n_h):
-                            w_range = (self.stride * w, self.stride * w + self.kernel_size)
-                            h_range = (self.stride * h, self.stride * h + self.kernel_size)
-
-                            inner_x = self.input_padded[batch, w_range[0]:w_range[1], h_range[0]:h_range[1], in_filter]
-                            output[batch, w, h, out_filter] = self.inner_op(
-                                inner_x,
-                                self.w.value[in_filter, :, :, out_filter],
-                                self.b.value[out_filter]
-                            )
-
-        return output
-
-    @staticmethod
-    def inner_op(inner_x, inner_w, inner_b):
-        return np.sum(np.multiply(inner_x, inner_w) + inner_b)
-
-    def backwards(self):
-        return
-
-
-
-
 class Dropout:
     """
     Defines a Dropout layer.
@@ -170,21 +85,6 @@ class Dropout:
         return np.multiply(self.drop_idx, upstream_grad)
 
 
-class BatchNormalization:
-    """
-    Defines a Batch Normalization layer.
-    """
-
-    def __init__(self):
-        return
-
-    def __call__(self, x):
-        return
-
-    def backwards(self):
-        return
-
-
 class ReLU:
     """
     Defines a Relu activation layer.
@@ -200,45 +100,3 @@ class ReLU:
     def backwards(self, upstream_grad):
         self.downstream_grad = upstream_grad * (self.input > 0)
         return self.downstream_grad
-
-
-class LeakyRelu:
-    """
-    Defines a Leaky Relu activation layer.
-    """
-
-    def __init__(self):
-        return
-
-    def __call__(self, x):
-        return
-
-    def backwards(self):
-        return
-
-
-class Tanh:
-    """
-    Defines a Tanh activation layer.
-    """
-
-    def __init__(self):
-        return
-
-    def __call__(self, x):
-        return
-
-    def backwards(self):
-        return
-
-
-class Sigmoid:
-    """
-    Defines a Sigmoid activation layer.
-    """
-
-    def __call__(self, x):
-        return
-
-    def backwards(self):
-        return
