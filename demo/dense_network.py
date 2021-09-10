@@ -9,8 +9,8 @@ from nn.scheduler import HyperParamScheduler
 if __name__ == "__main__":
 
     data_path = pathlib.Path.home() / "Desktop" / "MNIST" / "numpy"
-    x = np.load(data_path / "x.npy")
-    y = np.load(data_path / "y.npy")
+    x = np.load(str(data_path / "x.npy"))
+    y = np.load(str(data_path / "y.npy"))
 
     x = x.astype(np.int)
     y = y.astype(np.int)
@@ -34,8 +34,9 @@ if __name__ == "__main__":
     relu1 = ReLU()
     dense2 = Dense((batch_size, 200), 100)
     relu2 = ReLU()
-    drop1 = Dropout(0.2)
-    dense3 = Dense((batch_size, 100), 10)
+    dense3 = Dense((batch_size, 100), 50)
+    relu3 = ReLU()
+    dense4 = Dense((batch_size, 50), 10)
 
     loss_f = CrossEntropy()
     optimizer = Adam()
@@ -43,14 +44,14 @@ if __name__ == "__main__":
     # Initializing model
     model = Model(
         input_shape=(batch_size, dataset.x_train.shape[1]),
-        layers=[dense1, relu1, dense2, relu2, drop1, dense3],
+        layers=[dense1, relu1, dense2, relu2, dense3, relu3, dense4],
         loss_f=loss_f,
         optimizer=optimizer
     )
 
     # Create hyper-param schedulers
     lr_schedule = HyperParamScheduler(3e-4, 3e-3, True)
-    mom_schedule = HyperParamScheduler(0.8, 0.9, False)
+    mom_schedule = HyperParamScheduler(0.9, 0.99, False)
 
     # Train
     model.fit_one_cycle(
