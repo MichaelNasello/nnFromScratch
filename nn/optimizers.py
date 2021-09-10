@@ -11,7 +11,7 @@ class SGD:
     """
 
     @staticmethod
-    def step(model, l_r, wd, momentum):
+    def step(model, l_r, momentum):
         """
         Updates model parameters with their gradients.
         """
@@ -20,7 +20,7 @@ class SGD:
             if param.trainable:
 
                 # Update velocity of gradient
-                param.velocity = momentum * param.velocity - l_r * param.grad - l_r * wd * param.grad
+                param.velocity = momentum * param.velocity - l_r * param.grad
                 param.value += param.velocity
 
     @staticmethod
@@ -44,13 +44,16 @@ class Adam:
         self.beta2 = beta2
         self.eps = eps
 
-    def step(self, model, l_r, wd, t):
+    def step(self, model, l_r, t):
         """
         Updates model parameters with their gradients.
         """
 
         for param in model.parameters:
             if param.trainable:
+
+                # Helps with exploding gradient
+                param.grad /= np.linalg.norm(param.grad)
 
                 # Momentum with beta1
                 param.m = self.beta1 * param.m + (1 - self.beta1) * param.grad
@@ -62,8 +65,8 @@ class Adam:
                 m_debiased = param.m / (1 - self.beta1**t)
                 v_debiased = param.v / (1 - self.beta2**t)
 
-                # Param update (moving av of grad and weight decay)
-                param.value = param.value - l_r * (m_debiased / np.sqrt(v_debiased + self.eps)) #- 2 * l_r * wd * param.value
+                # Param update (moving av of grad)
+                param.value = param.value - l_r * (m_debiased / np.sqrt(v_debiased + self.eps))
 
     @staticmethod
     def zero_grad(model):
