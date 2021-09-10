@@ -53,7 +53,7 @@ class Model:
         """
 
         for layer in self.layers:
-            if type(layer) in [nn.layers.Dropout, nn.layers.BatchNormalization]:
+            if type(layer) in [nn.layers.Dropout]:
                 x = layer(x, training=self.training)
             else:
                 x = layer(x)
@@ -100,16 +100,14 @@ class Model:
 
         return weight_sum
 
-    def fit_one_cycle(self, x, y, n_epochs, lr_schedule, mom_schedule, batch_size, validation_set, wd=0.1):
+    def fit_one_cycle(self, x, y, n_epochs, lr_schedule, mom_schedule, batch_size, validation_set):
         """
         Trains model for n_epochs on (x, y). Evaluate on validation_set.
 
         Learning rates and momentum are scheduled using the 1cycle policy.
         """
+        print("Beginning train...\n")
 
-        # TODO: l1/l2 regularization, check everything, conv2d, max_pool, reshape, fix weight decay
-
-        # It is assumed batch_size divides evenly into the number of samples
         num_batches = x.shape[0] // batch_size
         num_val_batches = len(validation_set[0]) // batch_size
 
@@ -127,17 +125,13 @@ class Model:
             val_losses = []
             val_accuracies = []
 
-            """if self.opt_type == "sgd":
-                mom = mom_max_min[0]
-                mom_slope = (l_r_min_max[0] - l_r_min_max[1]) / (num_batches / 2)"""
-
             for batch in range(num_batches):
                 x_b, y_b = self.get_batch(x, y, batch, batch_size)
 
                 # Get model output and loss
                 self.training = True
                 pred = self.forwards(x_b)
-                loss = self.loss_f(pred, y_b) # * wd * self.sum_of_weights()
+                loss = self.loss_f(pred, y_b)
                 losses.append(loss)
 
                 # Backwards pass and parameter updates
@@ -145,9 +139,9 @@ class Model:
                 lr = lr_schedule(batch)
                 if self.opt_type == "sgd":
                     mom = mom_schedule(batch)
-                    self.optimizer.step(self, lr, wd, mom)
+                    self.optimizer.step(self, lr, mom)
                 elif self.opt_type == "adam":
-                    self.optimizer.step(self, lr, wd, batch + 1)
+                    self.optimizer.step(self, lr, batch + 1)
                 self.optimizer.zero_grad(self)
 
             # Computing validation loss, accuracy
@@ -164,8 +158,12 @@ class Model:
                 val_accuracies.append(mean_acc)
                 val_losses.append(loss_v)
 
-            print(f"Epoch: {epoch + 1}/{n_epochs}, Loss: {np.mean(losses):.3f}, Val Loss: {np.mean(val_losses):.3f}, "
-                  f"Val Acc: {np.mean(val_accuracies):.3f}")
+            print(
+                f"Epoch: {epoch + 1:2}/{n_epochs} -> Loss: {np.mean(losses):.3f} Val Loss: {np.mean(val_losses):.3f}, "
+                f"Val Acc: {np.mean(val_accuracies):.3f}"
+            )
+
+        print("Done training.")
 
     def predict(self, x):
         """
@@ -174,7 +172,7 @@ class Model:
 
         self.training = False
         for layer in self.layers:
-            if type(layer) in [nn.layers.Dropout, nn.layers.BatchNormalization]:
+            if type(layer) in [nn.layers.Dropout]:
                 x = layer(x, training=self.training)
             else:
                 x = layer(x)

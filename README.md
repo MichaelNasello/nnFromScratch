@@ -24,11 +24,27 @@ repository.
 The program `dense_network.py` trains a Dense (or Fully Connected) model on the mnist 
 dataset. 
 
-Below is the output for the first 5 epochs of training:
+Below is the output for the first 10 epochs of training:
 
 ![](demo/images/dense_network_train_output.png)
 
 Validation accuracy is increasing, and the model is clearly learning!
+
+## To Do
+***
+
+This work accomplishes my goal of demonstrating a fundamental understanding of a Neural 
+Network and its complex intricacies.
+
+However, in terms of a valid substitute for a ML framework such as Keras, this package is 
+not ready. We achieve convergence on a few ML problems; this convergence is not as strong
+as achieved by other de facto platforms. For example, on MNIST we can achieve around 
+85% validation accuracy with a MLP model. Similar models with Keras will achieve high 90s. 
+Work is currently in progress to improve convergence.
+
+To build a more robust ML package, additional work is to be done on layer, optimizer, and
+loss function implementations. Supported is a list of the more popular ones. A strong next
+candidate is the Conv2D layer.
 
 ## How it works
 ***
@@ -40,7 +56,7 @@ will store a parameter's value and gradient.
 
 ### Layers
 Now that we can handle create model parameters, it is the natural next step to build 
-up more meaningful Neural Network layers. Some layers, such as `Dense`, `Conv2D`, `ReLU`,
+up more meaningful Neural Network layers. Some layers, such as `Dense`, `ReLU`,
 and `Dropout`, are defined in `nn/layers.py`. I plan on appending to this list.
 
 Layers are essentially responsible for two things: the *forward pass*, and the *backward
@@ -70,8 +86,5 @@ The optimizer is where the magic happens! During a *training session*, a *backwa
 model is executed, and the gradients of all model parameters are computed. The optimizer is 
 responsible for updating parameter values with these gradients. Currently, two optimizers are
 defined: `SGD` and `Adam`. These implementations can be found at `nn/optimizers.py`. Several 
-techniques are used to accelerate/improve the convergence of the model, including *weight decay*,
-*momentum*, exponentially weighted moving averages of gradients, etc. 
-
-
-
+techniques are used to accelerate/improve the convergence of the model, including *momentum* and 
+*exponentially weighted moving averages* of gradients, etc.
